@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Permainan Tebak Angka dan Huruf</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap');
+  * {
+    box-sizing: border-box;
+  }
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #fff;
+    overflow: hidden;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: url('foto.png') no-repeat center top;
+    background-size: auto 70vh;
+    position: relative;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 0;
+  }
+  #app {
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    width: 340px;
+    max-width: 95vw;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    height: 320px;
+    backdrop-filter: blur(10px);
+    margin-top: 130px; /* margin atas untuk turunkan card */
+  }
+  h1 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .menu {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    flex: 1;
+    padding: 12px 0;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    color: #fff;
+    transition: background-color 0.3s ease;
+    user-select: none;
+    min-width: 104px;
+  }
+  .btn:active {
+    transform: scale(0.97);
+  }
+  .btn-sum {
+    background: #48c6ef;
+    box-shadow: 0 4px 10px #48c6efaa;
+  }
+  .btn-sum:hover {
+    background: #3aa9db;
+  }
+  .btn-sub {
+    background: #f857a6;
+    box-shadow: 0 4px 10px #f857a6aa;
+  }
+  .btn-sub:hover {
+    background: #db4d94;
+  }
+  .btn-huruf {
+    background: #fbbf24;
+    box-shadow: 0 4px 10px #fbbf24aa;
+    color: #1a1a1a;
+  }
+  .btn-huruf:hover {
+    background: #d4a018;
+  }
+  .game-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .hidden {
+    display: none;
+  }
+  .question {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    background: rgba(255,255,255,0.25);
+    padding: 12px 24px;
+    border-radius: 10px;
+    user-select: none;
+    text-align: center;
+    min-height: 50px;
+    word-wrap: break-word;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  input[type="number"],
+  input[type="text"] {
+    font-size: 1.2rem;
+    padding: 8px 12px;
+    width: 120px;
+    text-align: center;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    margin-bottom: 20px;
+    user-select: text;
+  }
+  input[type="number"]::-webkit-inner-spin-button, 
+  input[type="number"]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
+  .btn-submit {
+    background: #34d399;
+    color: #065f46;
+    font-weight: 700;
+    transition: background-color 0.3s ease;
+    padding: 8px 24px;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    user-select: none;
+  }
+  .btn-submit:hover {
+    background: #22c55e;
+  }
+  .feedback {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-top: 6px;
+    min-height: 24px;
+    user-select: none;
+    text-align: center;
+    height: 24px;
+  }
+  .feedback.correct {
+    color: #34d399;
+  }
+  .feedback.wrong {
+    color: #f87171;
+  }
+  .scoreboard {
+    margin-top: 18px;
+    text-align: center;
+    font-size: 1rem;
+    user-select: none;
+  }
+  .btn-back {
+    margin-top: 12px;
+    background: #3b82f6;
+    color: #e0e7ff;
+    font-weight: 600;
+    padding: 10px 0;
+    width: 100%;
+    border-radius: 10px;
+    user-select: none;
+  }
+  .btn-back:hover {
+    background: #2563eb;
+  }
+  @media (max-width: 360px) {
+    #app {
+      width: 100vw;
+      border-radius: 0;
+      box-shadow: none;
+      height: 100vh;
+      max-height: 100vh;
+      padding: 20px;
+      margin-top: 20px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="app" role="main">
+  <h1>Permainan Tebak Angka dan Huruf</h1>
+  <div id="menu" class="menu">
+    <button class="btn btn-sum" id="btnSum" aria-label="Pilih mode penjumlahan">Penjumlahan</button>
+    <button class="btn btn-sub" id="btnSub" aria-label="Pilih mode pengurangan">Pengurangan</button>
+    <button class="btn btn-huruf" id="btnHuruf" aria-label="Pilih mode tebak huruf">Tebak Huruf</button>
+  </div>
+
+  <div id="game" class="game-area hidden" role="region" aria-live="polite">
+    <div class="question" id="question" aria-atomic="true"></div>
+    <input type="text" id="answerInput" aria-label="Masukkan jawaban tebak angka atau huruf" autocomplete="off" maxlength="1" />
+    <button class="btn btn-submit" id="submitAnswer" aria-label="Kirim jawaban">Submit</button>
+    <div class="feedback" id="feedback" role="alert"></div>
+    <div class="scoreboard" id="scoreboard"></div>
+    <button class="btn btn-back" id="btnBack" aria-label="Kembali ke menu utama">Kembali ke Menu</button>
+  </div>
+</div>
+
+<!-- Audio elements -->
+<audio id="soundApplause" src="https://actions.google.com/sounds/v1/human_voices/applause.ogg" preload="auto"></audio>
+<audio id="soundVoiceRight" src="https://actions.google.com/sounds/v1/human_voices/voice_cheer.ogg" preload="auto"></audio>
+<audio id="soundWrongLocal" src="suarasalah.mp3" preload="auto"></audio>
+<audio id="soundTepukTangan" src="tepuktangan.mp3" preload="auto"></audio>
+
+<script>
+  // Elemen DOM
+  const menu = document.getElementById('menu');
+  const game = document.getElementById('game');
+  const questionEl = document.getElementById('question');
+  const answerInput = document.getElementById('answerInput');
+  const submitBtn = document.getElementById('submitAnswer');
+  const feedbackEl = document.getElementById('feedback');
+  const scoreboardEl = document.getElementById('scoreboard');
+  const btnBack = document.getElementById('btnBack');
+
+  // Audio elements
+  const soundApplause = document.getElementById('soundApplause');
+  const soundVoiceRight = document.getElementById('soundVoiceRight');
+  const soundWrongLocal = document.getElementById('soundWrongLocal');
+  const soundTepukTangan = document.getElementById('soundTepukTangan');
+
+  // State permainan
+  /*
+    mode: 'sum' | 'sub' | 'huruf'
+  */
+  let mode = null;
+  let currentQuestion = null;
+  let score = 0;
+  let totalQuestions = 0;
+  let sumStep = 1;
+  let hurufIndex = 0;
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+
+  // Generate soal
+  function generateQuestion() {
+    if (mode === 'sum') {
+      if (sumStep > 100) return null;
+      return {
+        num1: 1,
+        num2: sumStep,
+        operator: '+',
+        answer: 1 + sumStep,
+      };
+    } else if (mode === 'sub') {
+      // angka acak 1-10 sesuai permintaan Anda
+      const n1 = Math.floor(Math.random() * 10) + 1;
+      const n2 = Math.floor(Math.random() * 10) + 1;
+      if (n1 >= n2) {
+        return {
+          num1: n1,
+          num2: n2,
+          operator: '-',
+          answer: n1 - n2,
+        };
+      } else {
+        return {
+          num1: n2,
+          num2: n1,
+          operator: '-',
+          answer: n2 - n1,
+        };
+      }
+    } else if (mode === 'huruf') {
+      if (hurufIndex >= alphabet.length) return null;
+      return { letter: alphabet[hurufIndex] };
+    }
+  }
+
+  // Tampilkan soal
+  function displayQuestion() {
+    if (!currentQuestion) {
+      questionEl.textContent = 'Selamat! Kamu telah menyelesaikan semua soal.';
+      answerInput.style.display = 'none';
+      submitBtn.style.display = 'none';
+      feedbackEl.textContent = '';
+      scoreboardEl.textContent = `Skor akhir: ${score} / ${totalQuestions}`;
+      btnBack.style.display = 'block';
+      return;
+    }
+    if (mode === 'sum' || mode === 'sub') {
+      questionEl.textContent = `${currentQuestion.num1} ${currentQuestion.operator} ${currentQuestion.num2} = ?`;
+      answerInput.type = 'number';
+      answerInput.value = '';
+      answerInput.maxLength = null;
+    } else if (mode === 'huruf') {
+      // Tampilkan tanda star dan huruf kapital saat ini
+      const currentLetter = alphabet[hurufIndex].toUpperCase();
+      questionEl.textContent = `Tebak huruf: * (${currentLetter})`;
+      answerInput.type = 'text';
+      answerInput.value = '';
+      answerInput.maxLength = 1;
+    }
+    feedbackEl.textContent = '';
+    answerInput.style.display = 'inline-block';
+    submitBtn.style.display = 'inline-block';
+    answerInput.focus();
+    btnBack.style.display = 'block';
+    scoreboardEl.textContent = `Soal: ${totalQuestions + 1} | Skor: ${score} / ${totalQuestions}`;
+  }
+
+  // Mulai permainan
+  function startGame(selectedMode) {
+    mode = selectedMode;
+    score = 0;
+    totalQuestions = 0;
+    sumStep = 1;
+    hurufIndex = 0;
+    currentQuestion = null;
+    menu.classList.add('hidden');
+    game.classList.remove('hidden');
+    currentQuestion = generateQuestion();
+    displayQuestion();
+  }
+
+  // Putar suara benar (termasuk tepuk tangan)
+  function playCorrectSounds() {
+    soundTepukTangan.currentTime = 0;
+    soundTepukTangan.play();
+  }
+
+  // Putar suara salah
+  function playWrongSound() {
+    soundWrongLocal.currentTime = 0;
+    soundWrongLocal.play();
+  }
+
+  // Cek jawaban
+  function checkAnswer() {
+    let userAnswer = answerInput.value.trim().toLowerCase();
+    if (mode === 'sum' || mode === 'sub') {
+      userAnswer = parseInt(userAnswer);
+      if (isNaN(userAnswer)) {
+        feedbackEl.textContent = 'Masukkan angka sebagai jawaban!';
+        feedbackEl.className = 'feedback wrong';
+        answerInput.focus();
+        return;
+      }
+    } else if (mode === 'huruf') {
+      if (!userAnswer.match(/^[a-z]$/)) {
+        feedbackEl.textContent = 'Masukkan satu huruf dari a-z!';
+        feedbackEl.className = 'feedback wrong';
+        answerInput.focus();
+        return;
+      }
+    }
+
+    totalQuestions++;
+    let correct = false;
+    if (mode === 'sum' || mode === 'sub') {
+      if (userAnswer === currentQuestion.answer) correct = true;
+    } else if (mode === 'huruf') {
+      if (userAnswer === alphabet[hurufIndex]) correct = true;
+    }
+
+    if (correct) {
+      score++;
+      feedbackEl.textContent = 'Benar! 🎉 Yah Anda benar!';
+      feedbackEl.className = 'feedback correct';
+      playCorrectSounds();
+      setTimeout(() => {
+        if (mode === 'sum') sumStep++;
+        else if (mode === 'huruf') hurufIndex++;
+        currentQuestion = generateQuestion();
+        displayQuestion();
+      }, 1200);
+    } else {
+      feedbackEl.textContent = 'Alan kamu bodok sekali! 😂 Coba lagi.';
+      feedbackEl.className = 'feedback wrong';
+      playWrongSound();
+      answerInput.focus();
+      // Jangan tambah totalQuestions jika salah jawab agar skor dan soal konsisten
+      totalQuestions--;
+    }
+    scoreboardEl.textContent = `Soal: ${totalQuestions} | Skor: ${score} / ${totalQuestions}`;
+  }
+
+  // Kembali ke menu
+  function backToMenu() {
+    mode = null;
+    score = 0;
+    totalQuestions = 0;
+    sumStep = 1;
+    hurufIndex = 0;
+    currentQuestion = null;
+    game.classList.add('hidden');
+    menu.classList.remove('hidden');
+    feedbackEl.textContent = '';
+    scoreboardEl.textContent = '';
+    btnBack.style.display = 'none';
+    answerInput.style.display = 'inline-block';
+    submitBtn.style.display = 'inline-block';
+  }
+
+  // Event listeners
+  document.getElementById('btnSum').addEventListener('click', () => startGame('sum'));
+  document.getElementById('btnSub').addEventListener('click', () => startGame('sub'));
+  document.getElementById('btnHuruf').addEventListener('click', () => startGame('huruf'));
+  submitBtn.addEventListener('click', () => {
+    checkAnswer();
+  });
+  answerInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      checkAnswer();
+    }
+  });
+  btnBack.addEventListener('click', () => {
+    backToMenu();
+  });
+</script>
+</body>
+</html>
