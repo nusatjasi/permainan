@@ -99,6 +99,13 @@
   .btn-huruf:hover {
     background: #d4a018;
   }
+  .btn-puisi {
+    background: #8b5cf6;
+    box-shadow: 0 4px 10px #8b5cf6aa;
+  }
+  .btn-puisi:hover {
+    background: #7c3aed;
+  }
   .game-area {
     flex: 1;
     display: flex;
@@ -208,6 +215,7 @@
     <button class="btn btn-sum" id="btnSum" aria-label="Pilih mode penjumlahan">Penjumlahan</button>
     <button class="btn btn-sub" id="btnSub" aria-label="Pilih mode pengurangan">Pengurangan</button>
     <button class="btn btn-huruf" id="btnHuruf" aria-label="Pilih mode tebak huruf">Tebak Huruf</button>
+    <button class="btn btn-puisi" id="btnPuisi" aria-label="Putar puisi">Putar Puisi</button>
   </div>
 
   <div id="game" class="game-area hidden" role="region" aria-live="polite">
@@ -419,6 +427,9 @@
   document.getElementById('btnSum').addEventListener('click', () => startGame('sum'));
   document.getElementById('btnSub').addEventListener('click', () => startGame('sub'));
   document.getElementById('btnHuruf').addEventListener('click', () => startGame('huruf'));
+  document.getElementById('btnPuisi').addEventListener('click', () => {
+    window.location.href = 'puisi.mp4';
+  });
   submitBtn.addEventListener('click', () => {
     checkAnswer();
   });
